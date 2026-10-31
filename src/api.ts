@@ -19,8 +19,24 @@ export type PaginaEquipamentos = {
   limite: number;
 };
 
-export async function listarEquipamentos(): Promise<PaginaEquipamentos> {
-  const resposta = await fetch(`${API_URL}/equipamentos`);
+export type FiltrosEquipamentos = {
+  status?: StatusEquipamento;
+  tipo?: string;
+  pagina: number;
+  limite: number;
+};
+
+export async function listarEquipamentos(filtros: FiltrosEquipamentos): Promise<PaginaEquipamentos> {
+  // Monta a query string só com os filtros preenchidos, por exemplo: ?status=disponivel&pagina=2&limite=5
+  const parametros = new URLSearchParams({ pagina: String(filtros.pagina), limite: String(filtros.limite) });
+  if (filtros.status) {
+    parametros.set('status', filtros.status);
+  }
+  if (filtros.tipo) {
+    parametros.set('tipo', filtros.tipo);
+  }
+
+  const resposta = await fetch(`${API_URL}/equipamentos?${parametros}`);
   if (!resposta.ok) {
     throw new Error(`A API respondeu com o código ${resposta.status}.`);
   }
