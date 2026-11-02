@@ -3,7 +3,10 @@ import {
   listarEquipamentos,
   type PaginaEquipamentos,
   type StatusEquipamento,
+  listarEmprestimos,
+  type Emprestimo,
 } from "./api.ts";
+import AcoesEquipamento from "./AcoesEquipamento.tsx";
 import Login from "./Login.tsx";
 import NovoEquipamento from "./NovoEquipamento.tsx";
 
@@ -43,6 +46,11 @@ function App() {
   const [pagina, setPagina] = useState<PaginaEquipamentos | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
+  // Empréstimos ainda não devolvidos, por id do equipamento: mostram com quem cada um está.
+  const [emprestimosAbertos, setEmprestimosAbertos] = useState<
+    Map<number, Emprestimo>
+  >(new Map());
+
   // Filtros aplicados à busca e página atual.
   const [status, setStatus] = useState<StatusEquipamento | "">("");
   const [tipo, setTipo] = useState("");
@@ -54,15 +62,26 @@ function App() {
   // Busca de novo sempre que um filtro ou a página mudar.
   useEffect(() => {
     let cancelada = false;
-    listarEquipamentos({
-      status: status || undefined,
-      tipo: tipo || undefined,
-      pagina: numeroPagina,
-      limite: ITENS_POR_PAGINA,
-    })
-      .then((resultado) => {
+    // Busca os equipamentos e os empréstimos ao mesmo tempo.
+    Promise.all([
+      listarEquipamentos({
+        status: status || undefined,
+        tipo: tipo || undefined,
+        pagina: numeroPagina,
+        limite: ITENS_POR_PAGINA,
+      }),
+      listarEmprestimos(),
+    ])
+      .then(([resultado, emprestimos]) => {
         if (!cancelada) {
           setPagina(resultado);
+          setEmprestimosAbertos(
+            new Map(
+              emprestimos
+                .filter((e) => e.dataDevolucao === null)
+                .map((e) => [e.equipamento.id, e]),
+            ),
+          );
           setErro(null);
         }
       })
@@ -146,6 +165,7 @@ function App() {
               <th>Modelo</th>
               <th>Nº de série</th>
               <th>Status</th>
+              {token && <th>Ações</th>}
             </tr>
           </thead>
           <tbody>
@@ -159,7 +179,23 @@ function App() {
                   <span className={`status ${equipamento.status}`}>
                     {NOMES_STATUS[equipamento.status]}
                   </span>
+                  {emprestimosAbertos.has(equipamento.id) && (
+                    <div className="responsavel">
+                      com {emprestimosAbertos.get(equipamento.id)?.responsavel}
+                    </div>
+                  )}
                 </td>
+                {token && (
+                  <td>
+                    <AcoesEquipamento
+                      equipamento={equipamento}
+                      emprestimoAberto={emprestimosAbertos.get(equipamento.id)}
+                      token={token}
+                      aoAlterar={() => setVersaoLista(versaoLista + 1)}
+                      aoExpirarLogin={() => trocarToken(null)}
+                    />
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

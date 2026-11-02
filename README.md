@@ -9,7 +9,7 @@ Construída com **React** e **TypeScript**.
 - [x] Lista de equipamentos com o status de cada um
 - [x] Filtros por status e tipo, e paginação
 - [x] Login e cadastro de equipamentos
-- [ ] Empréstimos e devoluções
+- [x] Empréstimos e devoluções
 - [ ] Publicação online
 
 ## Como rodar
