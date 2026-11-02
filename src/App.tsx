@@ -1,19 +1,19 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from 'react';
 import {
   listarEquipamentos,
   type PaginaEquipamentos,
   type StatusEquipamento,
   listarEmprestimos,
   type Emprestimo,
-} from "./api.ts";
-import AcoesEquipamento from "./AcoesEquipamento.tsx";
-import Login from "./Login.tsx";
-import NovoEquipamento from "./NovoEquipamento.tsx";
+} from './api.ts';
+import AcoesEquipamento from './AcoesEquipamento.tsx';
+import Login from './Login.tsx';
+import NovoEquipamento from './NovoEquipamento.tsx';
 
 const NOMES_STATUS = {
-  disponivel: "Disponível",
-  emprestado: "Emprestado",
-  manutencao: "Em manutenção",
+  disponivel: 'Disponível',
+  emprestado: 'Emprestado',
+  manutencao: 'Em manutenção',
 };
 
 const ITENS_POR_PAGINA = 5;
@@ -21,7 +21,7 @@ const ITENS_POR_PAGINA = 5;
 // O token fica guardado no navegador para o login sobreviver a um F5.
 function lerTokenSalvo() {
   try {
-    return localStorage.getItem("token");
+    return localStorage.getItem('token');
   } catch {
     return null;
   }
@@ -30,9 +30,9 @@ function lerTokenSalvo() {
 function salvarToken(token: string | null) {
   try {
     if (token) {
-      localStorage.setItem("token", token);
+      localStorage.setItem('token', token);
     } else {
-      localStorage.removeItem("token");
+      localStorage.removeItem('token');
     }
   } catch {
     // Se o navegador bloquear o armazenamento, o login vale só enquanto a página estiver aberta.
@@ -47,17 +47,15 @@ function App() {
   const [erro, setErro] = useState<string | null>(null);
 
   // Empréstimos ainda não devolvidos, por id do equipamento: mostram com quem cada um está.
-  const [emprestimosAbertos, setEmprestimosAbertos] = useState<
-    Map<number, Emprestimo>
-  >(new Map());
+  const [emprestimosAbertos, setEmprestimosAbertos] = useState<Map<number, Emprestimo>>(new Map());
 
   // Filtros aplicados à busca e página atual.
-  const [status, setStatus] = useState<StatusEquipamento | "">("");
-  const [tipo, setTipo] = useState("");
+  const [status, setStatus] = useState<StatusEquipamento | ''>('');
+  const [tipo, setTipo] = useState('');
   const [numeroPagina, setNumeroPagina] = useState(1);
 
   // O que está sendo digitado no campo de tipo; só vira filtro ao clicar em "Filtrar".
-  const [tipoDigitado, setTipoDigitado] = useState("");
+  const [tipoDigitado, setTipoDigitado] = useState('');
 
   // Busca de novo sempre que um filtro ou a página mudar.
   useEffect(() => {
@@ -76,11 +74,7 @@ function App() {
         if (!cancelada) {
           setPagina(resultado);
           setEmprestimosAbertos(
-            new Map(
-              emprestimos
-                .filter((e) => e.dataDevolucao === null)
-                .map((e) => [e.equipamento.id, e]),
-            ),
+            new Map(emprestimos.filter((e) => e.dataDevolucao === null).map((e) => [e.equipamento.id, e])),
           );
           setErro(null);
         }
@@ -104,9 +98,7 @@ function App() {
     setToken(novo);
   }
 
-  const totalPaginas = pagina
-    ? Math.max(1, Math.ceil(pagina.total / pagina.limite))
-    : 1;
+  const totalPaginas = pagina ? Math.max(1, Math.ceil(pagina.total / pagina.limite)) : 1;
 
   return (
     <main>
@@ -128,7 +120,7 @@ function App() {
         <select
           value={status}
           onChange={(evento) => {
-            setStatus(evento.target.value as StatusEquipamento | "");
+            setStatus(evento.target.value as StatusEquipamento | '');
             setNumeroPagina(1);
           }}
         >
@@ -145,16 +137,10 @@ function App() {
         <button type="submit">Filtrar</button>
       </form>
 
-      {erro && (
-        <p className="erro">
-          Não foi possível carregar os equipamentos: {erro}
-        </p>
-      )}
+      {erro && <p className="erro">Não foi possível carregar os equipamentos: {erro}</p>}
       {!erro && !pagina && <p>Carregando...</p>}
 
-      {pagina && pagina.itens.length === 0 && (
-        <p>Nenhum equipamento encontrado.</p>
-      )}
+      {pagina && pagina.itens.length === 0 && <p>Nenhum equipamento encontrado.</p>}
 
       {pagina && pagina.itens.length > 0 && (
         <table>
@@ -176,13 +162,9 @@ function App() {
                 <td>{equipamento.modelo}</td>
                 <td>{equipamento.numeroSerie}</td>
                 <td>
-                  <span className={`status ${equipamento.status}`}>
-                    {NOMES_STATUS[equipamento.status]}
-                  </span>
+                  <span className={`status ${equipamento.status}`}>{NOMES_STATUS[equipamento.status]}</span>
                   {emprestimosAbertos.has(equipamento.id) && (
-                    <div className="responsavel">
-                      com {emprestimosAbertos.get(equipamento.id)?.responsavel}
-                    </div>
+                    <div className="responsavel">com {emprestimosAbertos.get(equipamento.id)?.responsavel}</div>
                   )}
                 </td>
                 {token && (
@@ -204,20 +186,13 @@ function App() {
 
       {pagina && (
         <div className="paginacao">
-          <button
-            disabled={numeroPagina <= 1}
-            onClick={() => setNumeroPagina(numeroPagina - 1)}
-          >
+          <button disabled={numeroPagina <= 1} onClick={() => setNumeroPagina(numeroPagina - 1)}>
             Anterior
           </button>
           <span>
-            Página {numeroPagina} de {totalPaginas} · {pagina.total}{" "}
-            equipamento(s)
+            Página {numeroPagina} de {totalPaginas} · {pagina.total} equipamento(s)
           </span>
-          <button
-            disabled={numeroPagina >= totalPaginas}
-            onClick={() => setNumeroPagina(numeroPagina + 1)}
-          >
+          <button disabled={numeroPagina >= totalPaginas} onClick={() => setNumeroPagina(numeroPagina + 1)}>
             Próxima
           </button>
         </div>
