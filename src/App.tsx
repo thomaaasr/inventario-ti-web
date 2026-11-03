@@ -138,7 +138,7 @@ function App() {
       </form>
 
       {erro && <p className="erro">Não foi possível carregar os equipamentos: {erro}</p>}
-      {!erro && !pagina && <p>Carregando...</p>}
+      {!erro && !pagina && <p>Carregando... No primeiro acesso, a API pode levar cerca de 1 minuto para acordar.</p>}
 
       {pagina && pagina.itens.length === 0 && <p>Nenhum equipamento encontrado.</p>}
 
