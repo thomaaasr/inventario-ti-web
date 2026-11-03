@@ -21,6 +21,7 @@ Acesse: **[inventario-ti-web-s2mz.onrender.com](https://inventario-ti-web-s2mz.o
 - [x] Login e cadastro de equipamentos
 - [x] Empréstimos e devoluções
 - [x] Publicação online
+- [x] Testes automatizados (Vitest e Testing Library)
 
 ## Como rodar
 
@@ -36,6 +37,14 @@ A interface abre em `http://localhost:5173`.
 
 Para apontar para outra API, defina a variável `VITE_API_URL` (por exemplo, num arquivo `.env.local`).
 
+## Testes
+
+Os testes simulam a API (não precisam dela rodando) e usam a tela como uma pessoa faria:
+
+```bash
+npm test
+```
+
 ## Tecnologias
 
-`React` `TypeScript` `Vite` `Prettier` `GitHub Actions` `Render`
+`React` `TypeScript` `Vite` `Vitest` `Testing Library` `Prettier` `GitHub Actions` `Render`
